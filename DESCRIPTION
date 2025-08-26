@@ -8,11 +8,10 @@ Description: HUD tools for automated/one-touch targets runs.
 License: `use_mit_license()`
 Encoding: UTF-8
 Roxygen: list(markdown = TRUE)
-RoxygenNote: 7.3.2.9000
+RoxygenNote: 7.3.2
 Imports:
   tidyverse,
   stringr,
-  Microsoft365R,
   jsonlite,
   httr,
   targets

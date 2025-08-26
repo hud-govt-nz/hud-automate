@@ -9,6 +9,7 @@ run_targets(
   project_name,
   container_url,
   upload_targets = c(),
+  ping = c(),
   invalidate = FALSE,
   forced = FALSE
 )
@@ -21,6 +22,8 @@ run_targets(
 \item{container_url}{Azure container URL}
 
 \item{upload_targets}{Name-strings of targets that should be uploaded}
+
+\item{ping}{Ping users in this message using their emails (case sensitive) as identifiers}
 
 \item{invalidate}{Re-run every target}
 

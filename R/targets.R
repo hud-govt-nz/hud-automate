@@ -17,62 +17,39 @@ get_target_report <- function() {
     return(report)
 }
 
-#' Make project card
+#' Send run report
 #'
-#' Generate a fancy formatted Teams message describing the outcome of a targets
-#' run.
+#' Generate and send a fancy formatted Teams message describing the outcome of
+#' a targets run.
 #'
-#' @name make_project_card
-#' @param run_name Run name
+#' @name send_run_report
 #' @param project_name Project name
+#' @param run_name Run name
+#' @param ping Ping users in this message using their emails (case sensitive) as identifiers
 #' @export
-make_project_card <- function(run_name, project_name) {
+send_run_report <- function(project_name, run_name, ping) {
     report <- get_target_report()
 
-    # Check report
-    if ("errored" %in% report$progress) {
-        status <- "FAILED"
-        color <- "error"
-    } else if (all(report$progress == "skipped")) {
-        status <- "Skipped"
-        color <- "warning"
-    } else {
-        status <- "SUCCESS"
-        color <- "good"
-    }
+    # Check status
+    status <- dplyr::case_when(
+        all(report$progress == "skipped") ~ "skipped",
+        any(report$progress == "errored") ~ "failed",
+        TRUE ~ "success")
 
-    # Items that go in the body of the card
-    card_items <- list(
-        # Run name
-        list(
-            type = "TextBlock",
-            text = paste(project_name, run_name, sep = "/"),
-            size = "medium",
-            weight = "bolder"
-        ),
-        # Run status
-        list(
-            type = "TextBlock",
-            text = status,
-            size = "large",
-            weight = "bolder",
-            spacing = "none",
-            color = color
-        ),
-        # Columns
-        list(
+    card_items <-
+        list(list(
             type = "ColumnSet",
             columns = list(
                 list(type = "Column", items = make_column_items(report, "name")),
                 list(type = "Column", items = make_column_items(report, "progress")),
-                list(type = "Column", items = make_column_items(report, "minutes"))
-            )
-        )
-    )
+                list(type = "Column", items = make_column_items(report, "minutes")))))
 
     # Create full payload around the card items
-    payload <- make_card_payload(card_items)
-    return(payload)
+    body <- make_base_card(
+        task_name = paste(project_name, run_name, sep = "/"),
+        status = status,
+        items = card_items)
+    send_card(body, ping)
 }
 
 #' Store files from targets run
@@ -120,10 +97,11 @@ store_run_data <- function(run_name, project_name, container_url, upload_targets
 #' @param project_name Project name
 #' @param container_url Azure container URL
 #' @param upload_targets Name-strings of targets that should be uploaded
+#' @param ping Ping users in this message using their emails (case sensitive) as identifiers
 #' @param invalidate Re-run every target
 #' @param forced Overwrite blob version
 #' @export
-run_targets <- function(run_name, project_name, container_url, upload_targets = c(), invalidate = FALSE, forced = FALSE) {
+run_targets <- function(run_name, project_name, container_url, upload_targets = c(), ping = c(), invalidate = FALSE, forced = FALSE) {
     message("Starting run '", run_name, "'...")
     if (invalidate) {
         message("\033[33;1m*** THIS WILL OVERWRITE THE OLD DATA, YOU HAVE 5 SECONDS TO ABORT ***\033[0m")
@@ -151,9 +129,7 @@ run_targets <- function(run_name, project_name, container_url, upload_targets = 
     else {
         message("\033[32;1mRun successful!\033[0m")
         store_run_data(run_name, project_name, container_url, upload_targets, forced)
-        # Send card
-        payload <- make_project_card(run_name, project_name)
-        send_teams(payload)
+        send_run_report(project_name, run_name, maintainers)
         message("\033[1;32mDone.\033[0m")
     }
 }

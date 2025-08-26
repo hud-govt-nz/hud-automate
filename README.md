@@ -8,6 +8,14 @@ Tools for managing a [{targets}](https://docs.ropensci.org/targets/) run:
 * Sends a message on Teams afterwards
 
 
+## Teams Webhook
+The `msteams` functions need a [Workflows webhook](https://support.microsoft.com/en-us/office/create-incoming-webhooks-with-workflows-for-microsoft-teams-8ae491c7-0394-4861-ba59-055e33f75498) set up to work. There should already be one that goes to the `Bot Health Channel`.
+
+I recommend that you send the message to a dedicated channel like `Bot Health Channel`, so that if automation goes wrong you don't end up spamming your colleagues. (Guess who accidentally DDOSed the Herald's main newsroom channel during COVID.)
+
+If you're writing your own payloads, you want to use the [AdaptiveCard designer](https://adaptivecards.microsoft.com/designer.html) to understand its structure.
+
+
 ## Installation
 You'll need `devtools::install_github` to install the package:
 ```R
