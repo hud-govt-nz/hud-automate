@@ -29,26 +29,14 @@ get_target_report <- function() {
 #' @export
 send_run_report <- function(project_name, run_name, ping) {
     report <- get_target_report()
-
-    # Check status
-    status <- dplyr::case_when(
-        all(report$progress == "skipped") ~ "skipped",
-        any(report$progress == "errored") ~ "failed",
-        TRUE ~ "success")
-
-    card_items <-
-        list(list(
-            type = "ColumnSet",
-            columns = list(
-                list(type = "Column", items = make_column_items(report, "name")),
-                list(type = "Column", items = make_column_items(report, "progress")),
-                list(type = "Column", items = make_column_items(report, "minutes")))))
-
-    # Create full payload around the card items
     body <- make_base_card(
         task_name = paste(project_name, run_name, sep = "/"),
-        status = status,
-        items = card_items)
+        status = dplyr::case_when(
+            all(report$progress == "skipped") ~ "skipped",
+            any(report$progress == "errored") ~ "failed",
+            TRUE ~ "success"),
+        items = list(
+            make_columnset(report, c("name", "progress", "minutes"))))
     send_card(body, ping)
 }
 

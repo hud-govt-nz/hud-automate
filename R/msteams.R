@@ -121,33 +121,37 @@ make_base_card <- function(task_name, status, items = NULL) {
     return(payload)
 }
 
-#' make_column_items
+#' Make columnset
 #' 
-#' Make the cells within a column using a dataframe column. Designed to be part
-#' of a card creator.
+#' Turn dataframe columns into a columnset for AdapativeCards.
 #' 
-#' @name make_column_items
-#' @param targ_df Dataframe to generate the column from
-#' @param col_name Name of the channel to post on
-make_column_items <- function(targ_df, col_name) {
-    header <- list(
-        type = "TextBlock",
-        text = col_name,
-        weight = "bolder")
-
-    column_items <- c(
-        list(header),
-        lapply(targ_df[[col_name]], function(x) {
-            list(
-                type = "TextBlock",
-                text = stringr::str_replace(x, "NA", "-"),
-                spacing = "none",
-                color = dplyr::case_when(
-                    x == "errored" ~ "attention",
-                    x == "skipped" ~ "accent",
-                    x == "completed" ~ "good",
-                    TRUE ~ "Default"))
-        }))
-
-    return(column_items)
+#' @name make_columnset
+#' @param targ_df Dataframe to generate the columnset from
+#' @param cols Names of the columns to use
+make_columnset <- function(targ_df, cols) {
+    columns <- lapply(cols, function(col_name) {
+        cells <- lapply(
+            targ_df[[col_name]],
+            function(x) {
+                list(
+                    type = "TextBlock",
+                    text = stringr::str_replace(x, "NA", "-"),
+                    spacing = "none",
+                    color = dplyr::case_when(
+                        x == "errored" ~ "attention",
+                        x == "skipped" ~ "accent",
+                        x == "completed" ~ "good",
+                        TRUE ~ "Default"))
+            })
+        header <- list(
+            type = "TextBlock",
+            text = col_name,
+            weight = "bolder")
+        column <- list(
+            type = "Column",
+            items = c(list(header), cells))
+        return(column)
+    }) 
+    columnset <- list(type = "ColumnSet", columns = columns)
+    return(columnset)
 }
