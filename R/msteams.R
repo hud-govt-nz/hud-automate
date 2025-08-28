@@ -86,10 +86,11 @@ send_msg <- function(msg, ...) {
 #' Creates message and card wrappers around the content of a card. Designed to
 #' be part of a card creator.
 #' 
-#' @name make_card_payload
+#' @name make_base_card
 #' @param task_name Task name
 #' @param status Task status
 #' @param items List of objects to go into a card body (see https://adaptivecards.microsoft.com/designer.html)
+#' @export
 make_base_card <- function(task_name, status, items = NULL) {
     # Determine overall status
     status <- ifelse(is.character(status) & status != "", status, "error")
@@ -128,6 +129,7 @@ make_base_card <- function(task_name, status, items = NULL) {
 #' @name make_columnset
 #' @param targ_df Dataframe to generate the columnset from
 #' @param cols Names of the columns to use
+#' @export
 make_columnset <- function(targ_df, cols) {
     columns <- lapply(cols, function(col_name) {
         cells <- lapply(
