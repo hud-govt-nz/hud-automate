@@ -84,48 +84,38 @@ store_run_data <- function(run_name, project_name, container_url, upload_targets
 
 #' Wrapper for running targets
 #'
-#' A complete wrapper for automated/one-touch target runs. Runs tar_make(),
-#' checks for errors, then upload files and sends a Teams message.
+#' Wrapper for automated target runs. Runs tar_make() and sends a Teams
+#' message, even on failures.
 #'
 #' @name run_targets
 #' @param run_name Run name
 #' @param project_name Project name
 #' @param container_url Azure container URL
-#' @param upload_targets Name-strings of targets that should be uploaded
 #' @param ping Ping users in this message using their emails (case sensitive) as identifiers
-#' @param invalidate Re-run every target
-#' @param forced Overwrite blob version
 #' @export
-run_targets <- function(run_name, project_name, container_url, upload_targets = c(), ping = c(), invalidate = FALSE, forced = FALSE) {
-    message("Starting run '", run_name, "'...")
-    if (invalidate) {
-        message("\033[33;1m*** THIS WILL OVERWRITE THE OLD DATA, YOU HAVE 5 SECONDS TO ABORT ***\033[0m")
-        Sys.sleep(5)
-        message("\033[33mInvalidating old data...\033[0m")
-        targets::tar_invalidate(everything())
-    }
+run_targets <- function(run_name, project_name, container_url, ping = c()) {
+    targets::tar_prune()
+    sitrep <- targets::tar_sitrep()
+    pending <- sitrep %>% filter(if_any(-c(name, never)))
 
-    message("\033[32mRunning targets...\033[0m")
-    run_report <-
-        tryCatch({
-            targets::tar_make()
-            targets::tar_progress()
-        }, error = function(e) {
-            message(e[1])
-            return(e)
-        })
-
-    if ("error" %in% class(run_report)) {
-        message("\033[31;1mtar_make() failed!\033[0m")
-    }
-    else if (all(run_report$progress == "skipped")) {
+    if (nrow(pending) == 0) {
         message("\033[33;1mNothing to do. Do you need to invalidate the previous run?\033[0m")
+        return(NULL)
     }
-    else {
-        message("\033[32;1mRun successful!\033[0m")
-        store_run_data(run_name, project_name, container_url, upload_targets, forced)
-        send_run_report(project_name, run_name, maintainers)
-        message("\033[1;32mDone.\033[0m")
+    if (all(sitrep$meta)) {
+        message("\033[32;1mStarting new run '", run_name, "'...\033[0m")
+    } else {
+        message("\033[33mResuming run '", run_name, "'...\033[0m")
     }
-}
+    message(nrow(pending), " out of ", nrow(sitrep), " tasks pending...")
 
+    tryCatch({
+        targets::tar_make()
+        send_run_report(project_name, run_name, ping)
+        message("\033[1;32mRun '", run_name, "' finished\033[0m")
+    }, error = function(e) {
+        send_run_report(project_name, run_name, ping, e[[1]])
+        print(e)
+        stop(e)
+    })
+}
