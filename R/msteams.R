@@ -82,10 +82,10 @@ send_msg <- function(msg, ...) {
 }
 
 #' Make card wrapper
-#' 
+#'
 #' Creates message and card wrappers around the content of a card. Designed to
 #' be part of a card creator.
-#' 
+#'
 #' @name make_base_card
 #' @param task_name Task name
 #' @param status Task status
@@ -123,9 +123,9 @@ make_base_card <- function(task_name, status, items = NULL) {
 }
 
 #' Make columnset
-#' 
+#'
 #' Turn dataframe columns into a columnset for AdapativeCards.
-#' 
+#'
 #' @name make_columnset
 #' @param targ_df Dataframe to generate the columnset from
 #' @param cols Names of the columns to use
@@ -153,7 +153,34 @@ make_columnset <- function(targ_df, cols) {
             type = "Column",
             items = c(list(header), cells))
         return(column)
-    }) 
+    })
     columnset <- list(type = "ColumnSet", columns = columns)
     return(columnset)
+}
+
+#' Make error block
+#'
+#' Turn error messages into a text block for AdapativeCards.
+#'
+#' @name make_error_block
+#' @param err_msg Error message (only the $message component of the error!)
+#' @export
+make_error_block <- function(err_msg) {
+    clean_msg <-
+        err_msg %>%
+        stringi::stri_enc_toascii() %>%
+        str_replace_all("\\032", "* ") %>% # Special symbols (just replace with astrix)
+        str_replace_all("\\[1m(.+?)\\033", "**\\1**") %>% # Try to keep bold modifiers
+        str_replace_all("\\]8;;(.+?)\\]8;;", "[\\1]()") %>% # Try to keep links
+        str_replace_all("\\033|\\[\\d+m|\\a", "") %>% # Remove other ANSI styles
+        str_replace_all("\\*{4}", "") %>% # Remove empty bold blocks
+        str_replace_all("\\n", "\\\n\\\n") # Only double line breaks are recognised
+    textblock <- list(
+        type = "TextBlock",
+        fontType = "monospace",
+        size = "small",
+        spacing = "none",
+        color = "attention",
+        text = clean_msg)
+    return(textblock)
 }

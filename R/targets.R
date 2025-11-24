@@ -26,17 +26,24 @@ get_target_report <- function() {
 #' @param project_name Project name
 #' @param run_name Run name
 #' @param ping Ping users in this message using their emails (case sensitive) as identifiers
+#' @param err_msg Error message ($message component of error object)
 #' @export
-send_run_report <- function(project_name, run_name, ping) {
+send_run_report <- function(project_name, run_name, ping, err_msg) {
+    # Core report
     report <- get_target_report()
+    items <- list(
+        make_columnset(report, c("name", "progress", "minutes")))
+    # Add error block
+    if (!is.null(err_msg)) {
+        items <- append(items, make_error_block(err_msg))
+    }
     body <- make_base_card(
         task_name = paste(project_name, run_name, sep = "/"),
         status = dplyr::case_when(
             all(report$progress == "skipped") ~ "skipped",
             any(report$progress == "errored") ~ "failed",
             TRUE ~ "success"),
-        items = list(
-            make_columnset(report, c("name", "progress", "minutes"))))
+        items = items)
     send_card(body, ping)
 }
 
