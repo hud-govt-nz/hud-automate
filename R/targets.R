@@ -55,31 +55,33 @@ send_run_report <- function(project_name, run_name, ping, err_msg) {
 #' @param run_name Run name
 #' @param project_name Project name
 #' @param container_url Azure container URL
-#' @param upload_targets Name-strings of targets that should be uploaded
+#' @param upload_targets Vector of name-strings for targets that should be uploaded
+#' @param upload_folders Vector of name-strings for folders that should be uploaded
 #' @param forced Overwrite blob version
 #' @export
-store_run_data <- function(run_name, project_name, container_url, upload_targets = c(), forced = FALSE) {
+store_run_data <- function(run_name, project_name, container_url, upload_targets = c(), upload_folders = c(), update = TRUE, forced = FALSE) {
     blob_path <- stringr::str_glue("{project_name}/outputs/{run_name}")
 
     for (tn in upload_targets) {
-        message(stringr::str_glue("Uploading '{tn}'..."))
-        hud.keep::store_data(
-            targets::tar_read_raw(tn),
-            stringr::str_glue("{blob_path}/{tn}.rds"),
-            container_url, forced = forced)
+        local_fn <-
+            hud.keep::store_data(
+                targets::tar_read_raw(tn),
+                stringr::str_glue("{blob_path}/{tn}.rds"),
+                container_url, update = update, forced = forced)
     }
 
-    message("Uploading validation files...")
-    hud.keep::store_folder(
-        "validation",
-        stringr::str_glue("{blob_path}/validation"),
-        container_url, forced = forced)
+    for (fn in upload_folders) {
+        hud.keep::store_folder(
+            fn,
+            blob_path,
+            container_url, update = update, forced = forced)
+    }
 
-    message("Uploading metadata...")
-    hud.keep::store_data(
-        get_target_report(),
-        stringr::str_glue("{blob_path}/run_report.rds"),
-        container_url, forced = forced)
+    local_fn <-
+        hud.keep::store_data(
+            get_target_report(),
+            stringr::str_glue("{blob_path}/run_report.rds"),
+            container_url, update = update, forced = forced)
 }
 
 #' Wrapper for running targets

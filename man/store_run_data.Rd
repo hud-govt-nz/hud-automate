@@ -9,6 +9,8 @@ store_run_data(
   project_name,
   container_url,
   upload_targets = c(),
+  upload_folders = c(),
+  update = TRUE,
   forced = FALSE
 )
 }
@@ -19,7 +21,9 @@ store_run_data(
 
 \item{container_url}{Azure container URL}
 
-\item{upload_targets}{Name-strings of targets that should be uploaded}
+\item{upload_targets}{Vector of name-strings for targets that should be uploaded}
+
+\item{upload_folders}{Vector of name-strings for folders that should be uploaded}
 
 \item{forced}{Overwrite blob version}
 }
