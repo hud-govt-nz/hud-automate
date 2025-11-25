@@ -3,6 +3,7 @@
 export(get_target_report)
 export(make_base_card)
 export(make_columnset)
+export(make_error_block)
 export(run_targets)
 export(send_card)
 export(send_msg)

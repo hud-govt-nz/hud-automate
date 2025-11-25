@@ -4,7 +4,7 @@
 \alias{send_run_report}
 \title{Send run report}
 \usage{
-send_run_report(project_name, run_name, ping)
+send_run_report(project_name, run_name, ping, err_msg)
 }
 \arguments{
 \item{project_name}{Project name}
@@ -12,6 +12,8 @@ send_run_report(project_name, run_name, ping)
 \item{run_name}{Run name}
 
 \item{ping}{Ping users in this message using their emails (case sensitive) as identifiers}
+
+\item{err_msg}{Error message ($message component of error object)}
 }
 \description{
 Generate and send a fancy formatted Teams message describing the outcome of

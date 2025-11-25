@@ -4,15 +4,7 @@
 \alias{run_targets}
 \title{Wrapper for running targets}
 \usage{
-run_targets(
-  run_name,
-  project_name,
-  container_url,
-  upload_targets = c(),
-  ping = c(),
-  invalidate = FALSE,
-  forced = FALSE
-)
+run_targets(run_name, project_name, container_url, ping = c())
 }
 \arguments{
 \item{run_name}{Run name}
@@ -21,15 +13,9 @@ run_targets(
 
 \item{container_url}{Azure container URL}
 
-\item{upload_targets}{Name-strings of targets that should be uploaded}
-
 \item{ping}{Ping users in this message using their emails (case sensitive) as identifiers}
-
-\item{invalidate}{Re-run every target}
-
-\item{forced}{Overwrite blob version}
 }
 \description{
-A complete wrapper for automated/one-touch target runs. Runs tar_make(),
-checks for errors, then upload files and sends a Teams message.
+Wrapper for automated target runs. Runs tar_make() and sends a Teams
+message, even on failures.
 }
