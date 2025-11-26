@@ -28,7 +28,7 @@ get_target_report <- function() {
 #' @param ping Ping users in this message using their emails (case sensitive) as identifiers
 #' @param err_msg Error message ($message component of error object)
 #' @export
-send_run_report <- function(project_name, run_name, ping, err_msg) {
+send_run_report <- function(project_name, run_name, ping, err_msg = NULL) {
     # Core report
     report <- get_target_report()
     items <- list(
