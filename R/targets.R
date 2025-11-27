@@ -35,7 +35,7 @@ send_run_report <- function(project_name, run_name, ping, err_msg = NULL) {
         make_columnset(report, c("name", "progress", "minutes")))
     # Add error block
     if (!is.null(err_msg)) {
-        items <- append(items, make_error_block(err_msg))
+        items <- append(items, list(make_error_block(err_msg)))
     }
     body <- make_base_card(
         task_name = paste(project_name, run_name, sep = "/"),
