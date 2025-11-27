@@ -4,7 +4,7 @@
 \alias{send_run_report}
 \title{Send run report}
 \usage{
-send_run_report(project_name, run_name, ping, err_msg)
+send_run_report(project_name, run_name, ping, err_msg = NULL)
 }
 \arguments{
 \item{project_name}{Project name}

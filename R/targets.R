@@ -92,10 +92,9 @@ store_run_data <- function(run_name, project_name, container_url, upload_targets
 #' @name run_targets
 #' @param run_name Run name
 #' @param project_name Project name
-#' @param container_url Azure container URL
 #' @param ping Ping users in this message using their emails (case sensitive) as identifiers
 #' @export
-run_targets <- function(run_name, project_name, container_url, ping = c()) {
+run_targets <- function(run_name, project_name, ping = c()) {
     targets::tar_prune()
     sitrep <- targets::tar_sitrep()
     pending <- sitrep %>% filter(if_any(-c(name, never)))

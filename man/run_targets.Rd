@@ -4,14 +4,12 @@
 \alias{run_targets}
 \title{Wrapper for running targets}
 \usage{
-run_targets(run_name, project_name, container_url, ping = c())
+run_targets(run_name, project_name, ping = c())
 }
 \arguments{
 \item{run_name}{Run name}
 
 \item{project_name}{Project name}
-
-\item{container_url}{Azure container URL}
 
 \item{ping}{Ping users in this message using their emails (case sensitive) as identifiers}
 }
