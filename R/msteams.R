@@ -27,6 +27,9 @@
 #' @param summary Summary message that'll be displayed on previews
 #' @export
 send_card <- function(body, ping = NULL, summary = "") {
+    # Webhooks are sensitive, so put them in .Renviron (i.e. not in the code)
+    webhook <- Sys.getenv("TEAMS_WEBHOOK")
+    if (webhook == "") stop("TEAMS_WEBHOOK not defined in .Renviron!")
     # Deal with pings
     entities <-
         lapply(ping, function(e) {
@@ -56,7 +59,7 @@ send_card <- function(body, ping = NULL, summary = "") {
                     msteams = list(width = "Full", entities = entities)))))
     # Send
     res <- httr::POST(
-        url = Sys.getenv("TEAMS_WEBHOOK"),
+        url = webhook,
         body = jsonlite::toJSON(payload, auto_unbox = TRUE),
         httr::content_type_json())
     if (httr::status_code(res) %in% c(200, 201, 202)) {
