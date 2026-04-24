@@ -7,8 +7,8 @@
 get_target_report <- function() {
     report <-
         dplyr::left_join(
-            targets::tar_progress(),
             targets::tar_meta(),
+            targets::tar_progress(),
             by = "name",
             relationship = "one-to-one")
 
@@ -67,8 +67,8 @@ send_run_report <- function(project_name, run_name, ping, err_msg = NULL) {
     body <- make_base_card(
         task_name = paste(project_name, run_name, sep = "/"),
         status = dplyr::case_when(
-            all(report$progress == "skipped") ~ "skipped",
-            any(report$progress == "errored") ~ "failed",
+            all(report$progress == "skipped", na.rm = TRUE) ~ "skipped",
+            any(report$progress == "errored", na.rm = TRUE) ~ "failed",
             TRUE ~ "success"),
         items = items)
     send_card(body, ping)
