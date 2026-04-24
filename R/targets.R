@@ -17,6 +17,33 @@ get_target_report <- function() {
     return(report)
 }
 
+#' Get Git summary
+#'
+#' Summarise current state of repo.
+#'
+#' @name get_git_summary
+#' @export
+get_git_summary <- function() {
+    uncommitted <-
+        gert::git_status() %>%
+        dplyr::summarise(
+            .by = status,
+            files = paste(file, collapse = ",")) %>%
+        tidyr::pivot_wider(names_from = status, values_from = files)
+
+    gert::git_commit_info() %>%
+        purrr::map(as.character) %>%
+        dplyr::as_tibble() %>%
+        dplyr::mutate(
+            url = gert::git_remote_info()$url,
+            branch = gert::git_branch(),
+            .before = 1) %>%
+        dplyr::mutate(
+            message = stringr::str_trim(message),
+            uncommitted) %>%
+        tidyr::pivot_longer(tidyselect::everything())
+}
+
 #' Send run report
 #'
 #' Generate and send a fancy formatted Teams message describing the outcome of
@@ -79,6 +106,12 @@ store_run_data <- function(run_name, project_name, container_url, upload_targets
 
     local_fn <-
         hud.keep::store_data(
+            get_git_summary(),
+            stringr::str_glue("{blob_path}/git_summary.rds"),
+            container_url, update = update, forced = forced)
+
+    local_fn <-
+        hud.keep::store_data(
             get_target_report(),
             stringr::str_glue("{blob_path}/run_report.rds"),
             container_url, update = update, forced = forced)
@@ -95,6 +128,12 @@ store_run_data <- function(run_name, project_name, container_url, upload_targets
 #' @param ping Ping users in this message using their emails (case sensitive) as identifiers
 #' @export
 run_targets <- function(run_name, project_name, ping = c()) {
+    uncommitted <- gert::git_status()    
+    if (nrow(uncommitted) > 0) {
+        print(uncommitted)
+        warning("There are uncommitted files!")
+    }
+
     targets::tar_prune()
     sitrep <- targets::tar_sitrep()
     pending <- sitrep %>% filter(if_any(-c(name, never)))
