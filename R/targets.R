@@ -31,17 +31,20 @@ get_git_summary <- function() {
             files = paste(file, collapse = ",")) %>%
         tidyr::pivot_wider(names_from = status, values_from = files)
 
-    gert::git_commit_info() %>%
+    git_summary <-
+        gert::git_commit_info() %>%
         purrr::map(as.character) %>%
         dplyr::as_tibble() %>%
         dplyr::mutate(
             url = gert::git_remote_info()$url,
             branch = gert::git_branch(),
             .before = 1) %>%
-        dplyr::mutate(
-            message = stringr::str_trim(message),
-            uncommitted) %>%
-        tidyr::pivot_longer(tidyselect::everything())
+        dplyr::mutate(message = stringr::str_trim(message))
+    
+    if (nrow(uncommitted) > 0) {
+        git_summary <- git_summary %>% mutate(uncommitted)
+    }
+    return(git_summary %>% tidyr::pivot_longer(tidyselect::everything()))
 }
 
 #' Send run report
@@ -150,7 +153,7 @@ store_run_data <- function(run_name, project_name, container_url, upload_targets
 #' @param ping Ping users in this message using their emails (case sensitive) as identifiers
 #' @export
 run_targets <- function(run_name, project_name, ping = c()) {
-    uncommitted <- gert::git_status()    
+    uncommitted <- gert::git_status()
     if (nrow(uncommitted) > 0) {
         print(uncommitted)
         warning("There are uncommitted files!")
