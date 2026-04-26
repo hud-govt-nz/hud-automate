@@ -74,6 +74,29 @@ send_run_report <- function(project_name, run_name, ping, err_msg = NULL) {
     send_card(body, ping)
 }
 
+#' Save files from current targets run
+#'
+#' Saves copies files from target folder into a named folder
+#'
+#' @name save_run_data
+#' @param run_name Run name
+#' @param output_path Base output folder
+#' @export
+save_run_data <- function(run_name, output_path = "outputs", curr_name = "current") {
+    curr_path <- file.path(output_path, curr_name)
+    run_path <- file.path(output_path, run_name)
+    message("Saving '", curr_path, "' to '", run_path, "'...")
+    dir.create(run_path, showWarnings = FALSE)
+    fs::dir_copy(curr_path, run_path, overwrite = TRUE)
+
+    write_tsv(
+        get_git_summary(),
+        file.path(run_path, "git_summary.tsv"))
+    write_tsv(
+        get_target_report(),
+        file.path(run_path, "run_report.tsv"))
+}
+
 #' Store files from targets run
 #'
 #' Stores a specific list of upload targets, validation files and metadata.
@@ -107,14 +130,13 @@ store_run_data <- function(run_name, project_name, container_url, upload_targets
     local_fn <-
         hud.keep::store_data(
             get_git_summary(),
-            stringr::str_glue("{blob_path}/git_summary.rds"),
-            container_url, update = update, forced = forced)
-
+            stringr::str_glue("{blob_path}/git_summary.tsv"),
+            container_url, f = write_tsv, forced = TRUE)
     local_fn <-
         hud.keep::store_data(
             get_target_report(),
-            stringr::str_glue("{blob_path}/run_report.rds"),
-            container_url, update = update, forced = forced)
+            stringr::str_glue("{blob_path}/run_report.tsv"),
+            container_url, f = write_tsv, forced = TRUE)
 }
 
 #' Wrapper for running targets
