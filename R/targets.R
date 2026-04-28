@@ -109,12 +109,12 @@ save_run_data <- function(run_name, output_path = "outputs", curr_name = "curren
 #' @param project_name Project name
 #' @param container_url Azure container URL
 #' @param upload_targets Vector of name-strings for targets that should be uploaded
-#' @param upload_folders Vector of name-strings for folders that should be uploaded
+#' @param output_path Base path for output folder
 #' @param forced Overwrite blob version
 #' @export
-store_run_data <- function(run_name, project_name, container_url, upload_targets = c(), upload_folders = c(), update = TRUE, forced = FALSE) {
-    blob_path <- stringr::str_glue("{project_name}/outputs/{run_name}")
-
+store_run_data <- function(run_name, project_name, container_url, upload_targets = c(), output_path = "outputs", update = TRUE, forced = FALSE) {
+    run_path <- file.path(output_path, run_name)
+    blob_path <- stringr::str_glue("{project_name}/{output_path}/{run_name}")
     for (tn in upload_targets) {
         local_fn <-
             hud.keep::store_data(
@@ -122,24 +122,9 @@ store_run_data <- function(run_name, project_name, container_url, upload_targets
                 stringr::str_glue("{blob_path}/{tn}.rds"),
                 container_url, update = update, forced = forced)
     }
-
-    for (fn in upload_folders) {
-        hud.keep::store_folder(
-            fn,
-            blob_path,
-            container_url, update = update, forced = forced)
-    }
-
-    local_fn <-
-        hud.keep::store_data(
-            get_git_summary(),
-            stringr::str_glue("{blob_path}/git_summary.tsv"),
-            container_url, f = write_tsv, forced = TRUE)
-    local_fn <-
-        hud.keep::store_data(
-            get_target_report(),
-            stringr::str_glue("{blob_path}/run_report.tsv"),
-            container_url, f = write_tsv, forced = TRUE)
+    hud.keep::store_folder(
+        run_path, blob_path,
+        container_url, update = update, forced = forced)
 }
 
 #' Wrapper for running targets
