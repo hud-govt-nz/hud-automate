@@ -4,12 +4,12 @@
 \alias{send_run_report}
 \title{Send run report}
 \usage{
-send_run_report(project_name, run_name, ping, err_msg = NULL)
+send_run_report(run_name, project_name, ping, err_msg = NULL)
 }
 \arguments{
-\item{project_name}{Project name}
-
 \item{run_name}{Run name}
+
+\item{project_name}{Project name}
 
 \item{ping}{Ping users in this message using their emails (case sensitive) as identifiers}
 
