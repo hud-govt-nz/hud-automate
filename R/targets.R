@@ -133,7 +133,7 @@ store_run_data <- function(run_name, project_name, container_url, upload_targets
 get_target_report <- function() {
     report <-
         dplyr::left_join(
-            targets::tar_meta(),
+            targets::tar_meta(targets_only = TRUE),
             targets::tar_progress(),
             by = "name",
             relationship = "one-to-one")
