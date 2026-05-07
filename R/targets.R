@@ -53,7 +53,7 @@ run_targets <- function(run_name, project_name, ping = c()) {
 #' @export
 send_run_report <- function(run_name, project_name, ping, err_msg = NULL) {
     # Core report
-    report <- get_targets_report()
+    report <- get_target_report()
     items <- list(
         make_columnset(report, c("name", "progress", "minutes")))
     # Add error block
@@ -88,10 +88,10 @@ save_run_data <- function(run_name, output_path = "outputs", curr_name = "curren
     # Write reports
     write_tsv(
         get_git_summary(),
-        file.path(run_path, ".git_summary.tsv"))
+        file.path(run_path, "git_summary.tsv"))
     write_tsv(
-        get_targets_report(),
-        file.path(run_path, ".targets_report.tsv"))
+        get_target_report(),
+        file.path(run_path, "run_report.tsv"))
 }
 
 #' Store files from targets run
@@ -128,12 +128,12 @@ store_run_data <- function(run_name, project_name, container_url, upload_targets
 #'
 #' Generate a report for targets using both the progress and metadata reports.
 #'
-#' @name get_targets_report
+#' @name get_target_report
 #' @export
-get_targets_report <- function() {
+get_target_report <- function() {
     report <-
         dplyr::left_join(
-            targets::tar_meta(),
+            targets::tar_meta(targets_only = TRUE),
             targets::tar_progress(),
             by = "name",
             relationship = "one-to-one")
