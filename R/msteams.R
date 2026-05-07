@@ -179,11 +179,14 @@ make_error_block <- function(err_msg) {
         str_replace_all("\\*{4}", "") %>% # Remove empty bold blocks
         str_replace_all("\\n", "\\\n\\\n") # Only double line breaks are recognised
     textblock <- list(
-        type = "TextBlock",
-        fontType = "monospace",
-        size = "small",
-        spacing = "none",
-        color = "attention",
-        text = clean_msg)
+        type = "Container",
+        style = "emphasis",
+        items = list(list(
+            type = "TextBlock",
+            fontType = "monospace",
+            size = "small",
+            spacing = "none",
+            color = "attention",
+            text = clean_msg)))
     return(textblock)
 }

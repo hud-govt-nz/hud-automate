@@ -35,6 +35,7 @@ run_targets <- function(run_name, project_name, ping = c()) {
         send_run_report(run_name, project_name, ping)
         message("\033[1;32mRun '", run_name, "' finished.\033[0m")
     }, error = function(e) {
+        message("\033[1;31mRun '", run_name, "' crashed!\033[0m")
         send_run_report(run_name, project_name, ping, e[[1]])
         stop(e)
     })
@@ -63,6 +64,7 @@ send_run_report <- function(run_name, project_name, ping, err_msg = NULL) {
     body <- make_base_card(
         task_name = paste(project_name, run_name, sep = "/"),
         status = dplyr::case_when(
+            !is.null(err_msg) ~ "crashed",
             all(report$progress == "skipped", na.rm = TRUE) ~ "skipped",
             any(report$progress == "errored", na.rm = TRUE) ~ "failed",
             TRUE ~ "success"),
