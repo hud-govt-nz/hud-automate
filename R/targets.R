@@ -1,3 +1,25 @@
+#' One-line run
+#'
+#' Runs targets, saves data locally, stores data on the blob
+#'
+#' @name run
+#' @param project_name Project name
+#' @param container_url Azure container URL
+#' @param maintainers List of maintainers to ping
+#' @param upload_targets Vector of name-strings for targets that should be uploaded
+#' @export
+run <- function(project_name, container_url, maintainers, upload_targets) {
+    # Make run_name available
+    targets::tar_make(run_name)
+    run_name <- targets::tar_read(run_name)
+
+    # Run and store
+    hud.automate::run_targets(run_name, project_name, ping = maintainers)
+    hud.automate::save_run_data(run_name)
+    hud.automate::store_run_data(run_name, project_name, container_url, upload_targets)
+    message("\033[32;1mFinished.\033[0m")
+}
+
 #' Wrapper for running targets
 #'
 #' Wrapper for automated target runs. Runs tar_make() and sends a Teams
