@@ -4,16 +4,16 @@
 \alias{run}
 \title{One-line run}
 \usage{
-run(project_name, container_url, maintainers, upload_targets)
+run(project_name, upload_targets, container_url, maintainers)
 }
 \arguments{
 \item{project_name}{Project name}
 
+\item{upload_targets}{Vector of name-strings for targets that should be uploaded}
+
 \item{container_url}{Azure container URL}
 
 \item{maintainers}{List of maintainers to ping}
-
-\item{upload_targets}{Vector of name-strings for targets that should be uploaded}
 }
 \description{
 Runs targets, saves data locally, stores data on the blob

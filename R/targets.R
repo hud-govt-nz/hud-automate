@@ -4,11 +4,11 @@
 #'
 #' @name run
 #' @param project_name Project name
+#' @param upload_targets Vector of name-strings for targets that should be uploaded
 #' @param container_url Azure container URL
 #' @param maintainers List of maintainers to ping
-#' @param upload_targets Vector of name-strings for targets that should be uploaded
 #' @export
-run <- function(project_name, container_url, maintainers, upload_targets) {
+run <- function(project_name, upload_targets, container_url, maintainers) {
     # Make run_name available
     targets::tar_make(run_name)
     run_name <- targets::tar_read(run_name)

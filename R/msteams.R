@@ -16,7 +16,7 @@
 #'
 #' If you run into trouble, test with a JSON string that is known to work and
 #' step up from there, e.g.:
-#' '[{ "type": "TextBlock", "text": "Hello World!" }]'
+#' '\\[{ "type": "TextBlock", "text": "Hello World!" }\\]'
 #'
 #' In R JSON-like structure, this is:
 #' list(list(type = "TextBlock", text = "Hello World!"))
