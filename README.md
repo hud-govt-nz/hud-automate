@@ -25,25 +25,21 @@ devtools::install_github("hud-govt-nz/hud-automate")
 ## Usage
 Example:
 ```R
-run_name <- Sys.Date()
-project_name <- "property-history"
-container_url <- "https://dlprojectsdataprod.blob.core.windows.net/projects"
-
-# Maintainers will be alerted on update
-maintainers <- list(
-    list(id = "keith.ng@hud.govt.nz", name = "Keith Ng"))
-# Target objects to store with each run
-upload_targets <- c(
-    "title_spine", "title_snapshots", "titles_spatial",
-    "cluster_spine", "cluster_snapshots", "clusters_spatial")
-
-hud.automate::run_targets(run_name, project_name, ping = maintainers) # Actually run the workflow
-hud.automate::save_run_data(run_name) # Save outputs/current by run_name locally
-hud.automate::store_run_data(run_name, project_name, container_url, upload_targets) # Store run on the blob
+hud.automate::run(
+    project_name,
+    # Target objects to store with each run
+    upload_targets = c(
+        "title_spine", "title_snapshots", "titles_spatial",
+        "cluster_spine", "cluster_snapshots", "clusters_spatial"),
+    # Blob storage container where the files will be stored
+    container_url = "https://dlprojectsdataprod.blob.core.windows.net/projects",
+    # Maintainers will be alerted on update
+    maintainers = list(
+        list(id = "keith.ng@hud.govt.nz", name = "Keith Ng")))
 ```
 
-When providing the parameters for `run_targets()`, follow these rules:
-* `run_name` should just be `YYYY-MM-DD`. `hud.keep::find_latest()` will look for last (A-Z sorted) folder with a matching structure. If you name the run something else, `hud.keep::find_latest()` will not find it (this may be desirable, if you want it to NOT be used by automated processes which rely on `hud.keep::find_latest()`). You can also use static run names during development.
+When writing targets for `run()`, follow these rules:
+* There should be a `run_name` object which is just the current `YYYY-MM-DD`. `hud.keep::find_latest()` will look for last (A-Z sorted) folder with a matching structure. If you name the run something else, `hud.keep::find_latest()` will not find it (this may be desirable, if you want it to NOT be used by automated processes which rely on `hud.keep::find_latest()`). You can also use static run names during development.
 * `project_name` should be kebab-case, and identical to the repository name (which should be kebab-case). This allows someone looking for the outputs of a project to find it easily on the blob.
 
 For your own safety, `hud-automate` does not invalidate old runs. You'll have to invalidate old runs manually with `targets::tar_invalidate(everything())` to start a new run.
