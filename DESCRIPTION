@@ -2,12 +2,13 @@ Package: hud.automate
 Title: HUD automation functions
 Version: 1.0.0.0000
 Authors@R:
-    person("Keith", "Ng", , "keith.ng@hud.govt.nz", role = c("aut", "cre"),
+    person("Keith", "Ng", , "keith.ng@mcert.govt.nz", role = c("aut", "cre"),
            comment = c(ORCID = "YOUR-ORCID-ID"))
 Description: HUD tools for automated/one-touch targets runs.
 License: `use_mit_license()`
 Encoding: UTF-8
 Roxygen: list(markdown = TRUE)
+RoxygenNote: 7.3.2
 Imports:
   tidyverse,
   stringr,
@@ -15,4 +16,3 @@ Imports:
   httr,
   targets,
   gert
-Config/roxygen2/version: 8.0.0

@@ -35,7 +35,7 @@ hud.automate::run(
     container_url = "https://dlprojectsdataprod.blob.core.windows.net/projects",
     # Maintainers will be alerted on update
     maintainers = list(
-        list(id = "keith.ng@hud.govt.nz", name = "Keith Ng")))
+        list(id = "keith.ng@mcert.govt.nz", name = "Keith Ng")))
 ```
 
 When writing targets for `run()`, follow these rules:
