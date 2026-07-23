@@ -4,7 +4,14 @@
 \alias{send_run_report}
 \title{Send run report}
 \usage{
-send_run_report(run_name, project_name, ping, err_msg = NULL)
+send_run_report(
+  run_name,
+  project_name,
+  ping,
+  err_msg = NULL,
+  max_rows = 50,
+  size_limit = 22000
+)
 }
 \arguments{
 \item{run_name}{Run name}
@@ -14,6 +21,10 @@ send_run_report(run_name, project_name, ping, err_msg = NULL)
 \item{ping}{Ping users in this message using their emails (case sensitive) as identifiers}
 
 \item{err_msg}{Error message ($message component of error object)}
+
+\item{max_rows}{Maximum number of rows to display}
+
+\item{size_limit}{Truncate run report to avoid going over Teams AdaptiveCard's 24k limit}
 }
 \description{
 Generate and send a fancy formatted Teams message describing the outcome of

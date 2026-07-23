@@ -58,11 +58,12 @@ send_card <- function(body, ping = NULL, summary = "") {
                     body = body,
                     msteams = list(width = "Full", entities = entities)))))
     # Send
-    res <- httr::POST(
-        url = webhook,
-        body = jsonlite::toJSON(payload, auto_unbox = TRUE),
-        httr::content_type_json())
-    if (httr::status_code(res) %in% c(200, 201, 202)) {
+    body <- jsonlite::toJSON(payload, auto_unbox = TRUE)
+    res <- httr::POST(url = webhook, body = body, httr::content_type_json())
+    # Teams AdaptiveCards have a 24k limit - send payload even though it's going to fail, so that it triggers an error on the Workflows side
+    if (nchar(body) > 24000) {
+        message("\033[31;1mPayload is too large (>24k characters)! Message will fail.\033[0m")
+    } else if (httr::status_code(res) %in% c(200, 201, 202)) {
         message("\033[32mMessage sent.\033[0m")
     } else {
         message("\033[31;1mFailed to send message: ", httr::content(res, "text"), "\033[0m")

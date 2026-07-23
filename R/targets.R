@@ -73,12 +73,31 @@ run_targets <- function(run_name, project_name, ping = c()) {
 #' @param project_name Project name
 #' @param ping Ping users in this message using their emails (case sensitive) as identifiers
 #' @param err_msg Error message ($message component of error object)
+#' @param max_rows Maximum number of rows to display
+#' @param size_limit Truncate run report to avoid going over Teams AdaptiveCard's 24k limit
 #' @export
-send_run_report <- function(run_name, project_name, ping, err_msg = NULL) {
-    # Core report
+send_run_report <- function(run_name, project_name, ping, err_msg = NULL, max_rows = 50, size_limit = 22000) {
+    targ_cols <- c("name", "progress", "minutes")
     report <- get_target_report()
-    items <- list(
-        make_columnset(report, c("name", "progress", "minutes")))
+    # Teams AdaptiveCards have a 24k limit, so truncate to fit (with buffer for the rest of the card)
+    for (i in seq(max_rows, 1)) {
+        kept_rows <- utils::head(report, i)
+        items <- list(make_columnset(kept_rows, targ_cols))
+        body_size <- nchar(jsonlite::toJSON(items, auto_unbox = TRUE))
+        if (body_size < size_limit) break
+    }
+    # Add truncation summary
+    if (i < nrow(report)) {
+        truncated_rows <- utils::tail(report, -i)
+        truncated_count <- count(truncated_rows, progress)
+        truncation_text <- map2(truncated_count$n, truncated_count$progress, paste)
+        items <- append(items, list(list(
+            type = "TextBlock",
+            text = paste0(
+                "...and ", nrow(truncated_rows), 
+                " truncated rows (", paste(truncation_text, collapse = ", "), ")."),
+            weight = "bolder")))
+    }
     # Add error block
     if (!is.null(err_msg)) {
         items <- append(items, list(make_error_block(err_msg)))
