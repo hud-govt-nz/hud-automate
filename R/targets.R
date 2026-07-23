@@ -162,6 +162,8 @@ get_target_report <- function() {
             by = "name",
             relationship = "one-to-one")
 
+    report <- dplyr::arrange(report, -as.numeric(time))
+    report <- dplyr::arrange(report, error)
     report$minutes <- format(round(report$seconds / 60, 1))
     report$minutes[report$progress != "completed"] <- "-"
     return(report)
